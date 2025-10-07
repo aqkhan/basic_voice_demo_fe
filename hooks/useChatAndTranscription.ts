@@ -1,25 +1,23 @@
 import { useMemo } from 'react';
 import {
   type ReceivedChatMessage,
-  type TextStreamData,
   useChat,
   useRoomContext,
-  useTranscriptions,
 } from '@livekit/components-react';
-import { transcriptionToChatMessage } from '@/lib/utils';
+import useTranscriptionMessages from './useTranscriptionMessages';
 
 export default function useChatAndTranscription() {
-  const transcriptions: TextStreamData[] = useTranscriptions();
   const chat = useChat();
   const room = useRoomContext();
+  const transcriptions = useTranscriptionMessages(room);
 
-  const mergedTranscriptions = useMemo(() => {
+  const mergedMessages = useMemo(() => {
     const merged: Array<ReceivedChatMessage> = [
-      ...transcriptions.map((transcription) => transcriptionToChatMessage(transcription, room)),
+      ...transcriptions,
       ...chat.chatMessages,
     ];
     return merged.sort((a, b) => a.timestamp - b.timestamp);
-  }, [transcriptions, chat.chatMessages, room]);
+  }, [transcriptions, chat.chatMessages]);
 
-  return { messages: mergedTranscriptions, send: chat.send };
+  return { messages: mergedMessages, send: chat.send };
 }
