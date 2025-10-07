@@ -10,6 +10,7 @@ import {
 } from '@livekit/components-react';
 import { toastAlert } from '@/components/alert-toast';
 import { EmailInputModal } from '@/components/email-input-modal';
+import { UrlInputModal } from '@/components/url-input-modal';
 import { AgentControlBar } from '@/components/livekit/agent-control-bar/agent-control-bar';
 import { ChatEntry } from '@/components/livekit/chat/chat-entry';
 import { ChatMessageView } from '@/components/livekit/chat/chat-message-view';
@@ -17,6 +18,7 @@ import { MediaTiles } from '@/components/livekit/media-tiles';
 import useChatAndTranscription from '@/hooks/useChatAndTranscription';
 import { useDebugMode } from '@/hooks/useDebug';
 import useEmailInput from '@/hooks/useEmailInput';
+import useUrlInput from '@/hooks/useUrlInput';
 import type { AppConfig } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -42,6 +44,7 @@ export const SessionView = ({
   const room = useRoomContext();
   const { showEmailInput, emailLabel, emailPlaceholder, submitEmail, closeEmailInput } =
     useEmailInput(room);
+  const { showUrlInput, urlLabel, urlPlaceholder, submitUrl, closeUrlInput } = useUrlInput(room);
 
   // Auto-open chat when first message/transcription arrives
   useEffect(() => {
@@ -184,6 +187,15 @@ export const SessionView = ({
         placeholder={emailPlaceholder}
         onSubmit={submitEmail}
         onClose={closeEmailInput}
+      />
+
+      {/* URL Input Modal */}
+      <UrlInputModal
+        isOpen={showUrlInput}
+        label={urlLabel}
+        placeholder={urlPlaceholder}
+        onSubmit={submitUrl}
+        onClose={closeUrlInput}
       />
     </section>
   );
