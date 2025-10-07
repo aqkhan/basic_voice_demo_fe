@@ -14,8 +14,16 @@ export default function useTranscriptionMessages(room: Room) {
 
   useEffect(() => {
     const handleDataReceived = (payload: Uint8Array, participant?: any) => {
+      console.log('[useTranscriptionMessages] DataReceived event triggered');
+      console.log('[useTranscriptionMessages] Payload:', payload);
+      console.log('[useTranscriptionMessages] Participant:', participant);
+
       try {
-        const data = JSON.parse(new TextDecoder().decode(payload)) as TranscriptionData;
+        const decodedString = new TextDecoder().decode(payload);
+        console.log('[useTranscriptionMessages] Decoded string:', decodedString);
+
+        const data = JSON.parse(decodedString);
+        console.log('[useTranscriptionMessages] Parsed data:', data);
 
         if (data.type === 'transcription') {
           console.log(`${data.role}: ${data.text}`);
@@ -28,16 +36,25 @@ export default function useTranscriptionMessages(room: Room) {
             from: data.role === 'user' ? room.localParticipant : participant,
           };
 
-          setTranscriptions((prev) => [...prev, transcriptionMessage]);
+          console.log('[useTranscriptionMessages] Adding transcription message:', transcriptionMessage);
+          setTranscriptions((prev) => {
+            const updated = [...prev, transcriptionMessage];
+            console.log('[useTranscriptionMessages] Updated transcriptions array:', updated);
+            return updated;
+          });
+        } else {
+          console.log('[useTranscriptionMessages] Data type is not transcription:', data.type);
         }
       } catch (error) {
-        console.error('Error parsing transcription data:', error);
+        console.error('[useTranscriptionMessages] Error parsing transcription data:', error);
       }
     };
 
+    console.log('[useTranscriptionMessages] Setting up DataReceived listener');
     room.on(RoomEvent.DataReceived, handleDataReceived);
 
     return () => {
+      console.log('[useTranscriptionMessages] Cleaning up DataReceived listener');
       room.off(RoomEvent.DataReceived, handleDataReceived);
     };
   }, [room]);
