@@ -16,7 +16,11 @@ export default function useChatAndTranscription() {
       ...transcriptions,
       ...chat.chatMessages,
     ];
-    return merged.sort((a, b) => a.timestamp - b.timestamp);
+    const sorted = merged.sort((a, b) => a.timestamp - b.timestamp);
+    console.log('[useChatAndTranscription] Total messages:', sorted.length);
+    console.log('[useChatAndTranscription] Transcriptions:', transcriptions.length);
+    console.log('[useChatAndTranscription] Chat messages:', chat.chatMessages.length);
+    return sorted;
   }, [transcriptions, chat.chatMessages]);
 
   return { messages: mergedMessages, send: chat.send };

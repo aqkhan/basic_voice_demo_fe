@@ -39,6 +39,14 @@ export const SessionView = ({
   const { messages, send } = useChatAndTranscription();
   const room = useRoomContext();
 
+  // Auto-open chat when first message/transcription arrives
+  useEffect(() => {
+    if (messages.length > 0 && !chatOpen) {
+      console.log('[SessionView] Auto-opening chat, messages:', messages.length);
+      setChatOpen(true);
+    }
+  }, [messages.length]);
+
   useDebugMode({
     enabled: process.env.NODE_END !== 'production',
   });
