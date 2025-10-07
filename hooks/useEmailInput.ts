@@ -14,29 +14,48 @@ export default function useEmailInput(room: Room) {
   const [emailPlaceholder, setEmailPlaceholder] = useState('your.email@example.com');
 
   useEffect(() => {
-    const handleDataReceived = (payload: Uint8Array) => {
+    const handleDataReceived = (
+      payload: Uint8Array,
+      participant?: any,
+      kind?: any,
+      topic?: string
+    ) => {
+      console.log('[useEmailInput] 📨 RAW DATA RECEIVED');
+      console.log('[useEmailInput] - Payload length:', payload.length);
+      console.log('[useEmailInput] - From participant:', participant?.identity);
+      console.log('[useEmailInput] - Kind:', kind);
+      console.log('[useEmailInput] - Topic:', topic);
+
       try {
         const decoder = new TextDecoder();
-        const data = JSON.parse(decoder.decode(payload)) as EmailInputRequest;
+        const dataString = decoder.decode(payload);
+        console.log('[useEmailInput] - Raw string:', dataString);
 
-        console.log('[useEmailInput] Received data:', data);
+        const data = JSON.parse(dataString) as EmailInputRequest;
+        console.log('[useEmailInput] - Parsed data:', data);
+        console.log('[useEmailInput] - Data type:', data.type);
+        console.log('[useEmailInput] - Input type:', data.input_type);
 
         if (data.type === 'request_input' && data.input_type === 'email') {
-          console.log('[useEmailInput] Email input requested');
+          console.log('[useEmailInput] ✅ EMAIL INPUT REQUESTED - SHOWING MODAL');
           setEmailLabel(data.label || 'Please enter your email address');
           setEmailPlaceholder(data.placeholder || 'your.email@example.com');
           setShowEmailInput(true);
+        } else {
+          console.log('[useEmailInput] ❌ Not an email request, ignoring');
         }
       } catch (error) {
-        console.error('[useEmailInput] Error parsing data:', error);
+        console.error('[useEmailInput] ❌ Error parsing data:', error);
       }
     };
 
-    console.log('[useEmailInput] Setting up DataReceived listener for email input');
+    console.log('[useEmailInput] 🔧 Setting up DataReceived listener');
+    console.log('[useEmailInput] - Room state:', room.state);
+    console.log('[useEmailInput] - Room name:', room.name);
     room.on(RoomEvent.DataReceived, handleDataReceived);
 
     return () => {
-      console.log('[useEmailInput] Cleaning up DataReceived listener');
+      console.log('[useEmailInput] 🧹 Cleaning up DataReceived listener');
       room.off(RoomEvent.DataReceived, handleDataReceived);
     };
   }, [room]);
