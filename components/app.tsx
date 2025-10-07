@@ -36,23 +36,12 @@ export function App({ appConfig }: AppProps) {
       });
     };
 
-    // DEBUG: Log ALL data received at the app level
-    const onDataReceived = (payload: Uint8Array, participant: any) => {
-      console.log('[App] 🔴 DATA RECEIVED AT APP LEVEL', {
-        payloadLength: payload.length,
-        participant: participant?.identity,
-        decoded: new TextDecoder().decode(payload),
-      });
-    };
-
     room.on(RoomEvent.MediaDevicesError, onMediaDevicesError);
     room.on(RoomEvent.Disconnected, onDisconnected);
-    room.on(RoomEvent.DataReceived, onDataReceived);
 
     return () => {
       room.off(RoomEvent.Disconnected, onDisconnected);
       room.off(RoomEvent.MediaDevicesError, onMediaDevicesError);
-      room.off(RoomEvent.DataReceived, onDataReceived);
     };
   }, [room, refreshConnectionDetails]);
 
