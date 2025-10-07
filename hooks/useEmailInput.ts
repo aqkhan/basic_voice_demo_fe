@@ -9,6 +9,10 @@ interface EmailInputRequest {
 }
 
 export default function useEmailInput(room: Room) {
+  console.log('[useEmailInput] 🚀 HOOK INITIALIZED');
+  console.log('[useEmailInput] - Room provided:', !!room);
+  console.log('[useEmailInput] - Room state:', room?.state);
+
   const [showEmailInput, setShowEmailInput] = useState(false);
   const [emailLabel, setEmailLabel] = useState('Please enter your email address');
   const [emailPlaceholder, setEmailPlaceholder] = useState('your.email@example.com');

@@ -43,6 +43,9 @@ export const SessionView = ({
   const { showEmailInput, emailLabel, emailPlaceholder, submitEmail, closeEmailInput } =
     useEmailInput(room);
 
+  // TEST: Manual trigger for email modal (for debugging)
+  const [manualEmailTest, setManualEmailTest] = useState(false);
+
   // Debug logging
   useEffect(() => {
     console.log('[SessionView] Component mounted/updated');
@@ -200,12 +203,32 @@ export const SessionView = ({
 
       {/* Email Input Modal */}
       <EmailInputModal
-        isOpen={showEmailInput}
+        isOpen={showEmailInput || manualEmailTest}
         label={emailLabel}
         placeholder={emailPlaceholder}
-        onSubmit={submitEmail}
-        onClose={closeEmailInput}
+        onSubmit={(email) => {
+          console.log('[SessionView] Email submitted:', email);
+          submitEmail(email);
+          setManualEmailTest(false);
+        }}
+        onClose={() => {
+          closeEmailInput();
+          setManualEmailTest(false);
+        }}
       />
+
+      {/* DEBUG: Test button to manually trigger email modal */}
+      {sessionStarted && (
+        <button
+          onClick={() => {
+            console.log('[SessionView] Manual email test triggered');
+            setManualEmailTest(true);
+          }}
+          className="fixed bottom-20 left-4 z-[999] rounded bg-purple-600 px-4 py-2 text-white hover:bg-purple-700"
+        >
+          Test Email UI
+        </button>
+      )}
     </section>
   );
 };
