@@ -35,6 +35,12 @@ export default function useEmailInput(room: Room) {
       console.log('[useEmailInput] - Kind:', kind);
       console.log('[useEmailInput] - Topic:', topic);
 
+      // Only process messages with topic "email_input"
+      if (topic !== 'email_input') {
+        console.log('[useEmailInput] ❌ Wrong topic, ignoring (expected "email_input")');
+        return;
+      }
+
       try {
         const decoder = new TextDecoder();
         const dataString = decoder.decode(payload);
