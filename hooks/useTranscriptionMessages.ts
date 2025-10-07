@@ -2,60 +2,50 @@ import { useEffect, useState } from 'react';
 import { RoomEvent, type Room } from 'livekit-client';
 import type { ReceivedChatMessage } from '@livekit/components-react';
 
-interface TranscriptionData {
-  type: 'transcription';
-  role: 'assistant' | 'user';
-  text: string;
-  timestamp?: number;
-}
-
 export default function useTranscriptionMessages(room: Room) {
   const [transcriptions, setTranscriptions] = useState<ReceivedChatMessage[]>([]);
 
   useEffect(() => {
-    const handleDataReceived = (payload: Uint8Array, participant?: any) => {
-      console.log('[useTranscriptionMessages] DataReceived event triggered');
-      console.log('[useTranscriptionMessages] Payload:', payload);
+    const handleTranscriptionReceived = (
+      segments: { text: string; id: string; final: boolean }[],
+      participant: any,
+      publication: any
+    ) => {
+      console.log('[useTranscriptionMessages] Transcription received');
+      console.log('[useTranscriptionMessages] Segments:', segments);
       console.log('[useTranscriptionMessages] Participant:', participant);
 
-      try {
-        const decodedString = new TextDecoder().decode(payload);
-        console.log('[useTranscriptionMessages] Decoded string:', decodedString);
+      // Process each segment
+      segments.forEach((segment) => {
+        // Only add final transcriptions to avoid duplicates
+        if (segment.final) {
+          const isLocal = participant?.identity === room.localParticipant?.identity;
 
-        const data = JSON.parse(decodedString);
-        console.log('[useTranscriptionMessages] Parsed data:', data);
-
-        if (data.type === 'transcription') {
-          console.log(`${data.role}: ${data.text}`);
-
-          // Convert transcription to chat message format
           const transcriptionMessage: ReceivedChatMessage = {
-            id: `transcription-${Date.now()}-${Math.random()}`,
-            timestamp: data.timestamp || Date.now(),
-            message: data.text,
-            from: data.role === 'user' ? room.localParticipant : participant,
+            id: segment.id || `transcription-${Date.now()}-${Math.random()}`,
+            timestamp: Date.now(),
+            message: segment.text,
+            from: isLocal ? room.localParticipant : participant,
           };
 
-          console.log('[useTranscriptionMessages] Adding transcription message:', transcriptionMessage);
+          console.log('[useTranscriptionMessages] Adding final transcription:', transcriptionMessage);
           setTranscriptions((prev) => {
-            const updated = [...prev, transcriptionMessage];
-            console.log('[useTranscriptionMessages] Updated transcriptions array:', updated);
-            return updated;
+            // Avoid duplicates by checking if ID already exists
+            if (prev.some((t) => t.id === transcriptionMessage.id)) {
+              return prev;
+            }
+            return [...prev, transcriptionMessage];
           });
-        } else {
-          console.log('[useTranscriptionMessages] Data type is not transcription:', data.type);
         }
-      } catch (error) {
-        console.error('[useTranscriptionMessages] Error parsing transcription data:', error);
-      }
+      });
     };
 
-    console.log('[useTranscriptionMessages] Setting up DataReceived listener');
-    room.on(RoomEvent.DataReceived, handleDataReceived);
+    console.log('[useTranscriptionMessages] Setting up TranscriptionReceived listener');
+    room.on(RoomEvent.TranscriptionReceived, handleTranscriptionReceived);
 
     return () => {
-      console.log('[useTranscriptionMessages] Cleaning up DataReceived listener');
-      room.off(RoomEvent.DataReceived, handleDataReceived);
+      console.log('[useTranscriptionMessages] Cleaning up TranscriptionReceived listener');
+      room.off(RoomEvent.TranscriptionReceived, handleTranscriptionReceived);
     };
   }, [room]);
 
