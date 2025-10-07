@@ -6,11 +6,15 @@ export default function useTranscriptionMessages(room: Room) {
   const [transcriptions, setTranscriptions] = useState<ReceivedChatMessage[]>([]);
 
   useEffect(() => {
+    console.log('[useTranscriptionMessages] Hook initialized, room:', room);
+    console.log('[useTranscriptionMessages] Room state:', room.state);
+
     const handleTranscriptionReceived = (
       segments: { text: string; id: string; final: boolean }[],
       participant: any,
       publication: any
     ) => {
+      console.log('=== TRANSCRIPTION RECEIVED ===');
       console.log('[useTranscriptionMessages] Transcription received');
       console.log('[useTranscriptionMessages] Segments:', segments);
       console.log('[useTranscriptionMessages] Participant:', participant);

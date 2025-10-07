@@ -43,6 +43,18 @@ export const SessionView = ({
   const { showEmailInput, emailLabel, emailPlaceholder, submitEmail, closeEmailInput } =
     useEmailInput(room);
 
+  // Debug logging
+  useEffect(() => {
+    console.log('[SessionView] Component mounted/updated');
+    console.log('[SessionView] sessionStarted:', sessionStarted);
+    console.log('[SessionView] chatOpen:', chatOpen);
+    console.log('[SessionView] messages.length:', messages.length);
+    console.log('[SessionView] messages:', messages);
+    console.log('[SessionView] agentState:', agentState);
+    console.log('[SessionView] showEmailInput:', showEmailInput);
+    console.log('[SessionView] room state:', room.state);
+  });
+
   // Auto-open chat when first message/transcription arrives
   useEffect(() => {
     if (messages.length > 0 && !chatOpen) {
