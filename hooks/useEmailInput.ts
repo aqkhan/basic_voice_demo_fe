@@ -18,6 +18,11 @@ export default function useEmailInput(room: Room) {
   const [emailPlaceholder, setEmailPlaceholder] = useState('your.email@example.com');
 
   useEffect(() => {
+    if (!room) {
+      console.log('[useEmailInput] ❌ No room provided');
+      return;
+    }
+
     const handleDataReceived = (
       payload: Uint8Array,
       participant?: any,
@@ -56,7 +61,14 @@ export default function useEmailInput(room: Room) {
     console.log('[useEmailInput] 🔧 Setting up DataReceived listener');
     console.log('[useEmailInput] - Room state:', room.state);
     console.log('[useEmailInput] - Room name:', room.name);
+    console.log('[useEmailInput] - Room object:', room);
+
+    // Add listener
     room.on(RoomEvent.DataReceived, handleDataReceived);
+    console.log('[useEmailInput] ✅ Listener attached');
+
+    // Check if there are any remote participants
+    console.log('[useEmailInput] - Remote participants:', Array.from(room.remoteParticipants.values()).map(p => p.identity));
 
     return () => {
       console.log('[useEmailInput] 🧹 Cleaning up DataReceived listener');

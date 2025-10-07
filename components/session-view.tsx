@@ -46,6 +46,15 @@ export const SessionView = ({
   // TEST: Manual trigger for email modal (for debugging)
   const [manualEmailTest, setManualEmailTest] = useState(false);
 
+  // DEBUG: Global data listener to catch ALL data messages
+  useEffect(() => {
+    const globalDataHandler = (...args: any[]) => {
+      console.log('[SessionView] 🌍 GLOBAL DATA RECEIVED', args);
+    };
+    room.on('dataReceived' as any, globalDataHandler);
+    return () => room.off('dataReceived' as any, globalDataHandler);
+  }, [room]);
+
   // Debug logging
   useEffect(() => {
     console.log('[SessionView] Component mounted/updated');
