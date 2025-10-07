@@ -52,7 +52,9 @@ export const SessionView = ({
       console.log('[SessionView] 🌍 GLOBAL DATA RECEIVED', args);
     };
     room.on('dataReceived' as any, globalDataHandler);
-    return () => room.off('dataReceived' as any, globalDataHandler);
+    return () => {
+      room.off('dataReceived' as any, globalDataHandler);
+    };
   }, [room]);
 
   // Debug logging
