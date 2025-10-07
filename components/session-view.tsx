@@ -217,17 +217,37 @@ export const SessionView = ({
         }}
       />
 
-      {/* DEBUG: Test button to manually trigger email modal */}
+      {/* DEBUG: Test buttons */}
       {sessionStarted && (
-        <button
-          onClick={() => {
-            console.log('[SessionView] Manual email test triggered');
-            setManualEmailTest(true);
-          }}
-          className="fixed bottom-20 left-4 z-[999] rounded bg-purple-600 px-4 py-2 text-white hover:bg-purple-700"
-        >
-          Test Email UI
-        </button>
+        <div className="fixed bottom-20 left-4 z-[999] flex flex-col gap-2">
+          <button
+            onClick={() => {
+              console.log('[SessionView] Manual email test triggered');
+              setManualEmailTest(true);
+            }}
+            className="rounded bg-purple-600 px-4 py-2 text-white hover:bg-purple-700"
+          >
+            Test Email UI
+          </button>
+          <button
+            onClick={() => {
+              console.log('[SessionView] Sending test data message to self');
+              const testMessage = {
+                type: 'request_input',
+                input_type: 'email',
+                label: 'Test Email Input',
+                placeholder: 'test@example.com',
+              };
+              const encoder = new TextEncoder();
+              const data = encoder.encode(JSON.stringify(testMessage));
+              room.localParticipant.publishData(data, { reliable: true });
+              console.log('[SessionView] Test data message sent');
+            }}
+            className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+          >
+            Send Test Data
+          </button>
+        </div>
       )}
     </section>
   );
